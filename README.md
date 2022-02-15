@@ -13,7 +13,7 @@ $ pip install -r requirements.txt
 ```
 $ python3 manage.py runserver
 ```
-Then go to:
+## How to test the API
 ```
-http://127.0.0.1:8000/get_xpath/
+$ curl http://127.0.0.1:8000/get_xpath/ -H "Content-Type: application/json" -d '{"url": "https://google.com"}'
 ```
