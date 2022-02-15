@@ -1,20 +1,20 @@
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseBadRequest
 from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework.parsers import JSONParser
+from selenium.common.exceptions import InvalidArgumentException
 import json
 
 from . import helpers
 
-@api_view(['POST', 'GET'])
+@api_view(['POST'])
 def get_xpath(request):
-    if request.method == 'GET':
-        return render(request, 'get_xpath.html')
-    elif request.method == 'POST':
-        url = request.POST.get("url")
+    url = json.loads(request.body).get("url")
+    if not url:
+        return HttpResponseBadRequest("Data body is invalid!")
+    try:
         content = helpers.get_data_from_url_by_chromedriver(url)
-        soup = helpers.get_bs_data(content)
-        xpath_data = helpers.get_xpath(soup)
-        title = helpers.get_title(soup)
-        return HttpResponse(json.dumps({"title": title, "xpaths": xpath_data}, indent=4))
+    except InvalidArgumentException:
+        return HttpResponseBadRequest("URL is invalid!")
+    soup = helpers.get_bs_data(content)
+    xpath_data = helpers.get_xpath(soup)
+    title = helpers.get_title(soup)
+    return HttpResponse(json.dumps({"title": title, "xpaths": xpath_data}, indent=4))
