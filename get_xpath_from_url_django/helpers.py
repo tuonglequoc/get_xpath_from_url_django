@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup as bs
+from bs4 import BeautifulSoup as bs, element as bsElement
 from selenium import webdriver
 from selenium.webdriver import ChromeOptions as Options
 
@@ -62,6 +62,10 @@ def get_xpath(soup: bs):
             # assign to result
             element_result["xpath"] = xpath
             element_result["attributes"] = element.attrs
+
+            # combine option values in case of <select> tag
+            if tag == "select":
+                element_result["attributes"]["options"] = [ child.get("value") for child in element.children if type(child) is bsElement.Tag ]
 
             # convert class list to "class1 class2 class3 ..."
             class_attr = element_result["attributes"].get("class")
